@@ -1,5 +1,5 @@
 CLASS_LIST_INFO = "HELPER_EXT";
-COUNT_MONTH_CHECK = 2;
+COUNT_MONTH_CHECK = 3;
 
 function fraudHelper(selector, callback) {
   let current_order_id = null, current_customer_id = null;
