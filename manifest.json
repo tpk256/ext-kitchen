@@ -1,0 +1,36 @@
+{
+    "manifest_version": 3,
+    "name": "OperatorHelper",
+    "version": "1.0",
+    "description": "Помошник оператора",
+    "permissions": ["storage", "scripting", "activeTab"],
+    "host_permissions": ["<all_urls>"],
+ 
+    "content_scripts": [
+        {
+            "matches": ["https://mykitchen.digital/new/complaint?uniqueId=*"],
+            "js": ["disable_btn.js"],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": ["https://mykitchen.digital/orders/*", "https://mykitchen.digital/orders"],
+            "js": ["fraud_info.js"],
+            "run_at": "document_idle"
+        },
+        
+        {
+            "matches": [ 
+                "https://mykitchen.digital/new/complaint",
+                "https://mykitchen.digital/new/complaint/*/create",
+                "https://mykitchen.digital/new/complaint?uniqueId=*",
+                "https://mykitchen.digital/new/complaint/*/create?uniqueId=*",
+                "https://mykitchen.digital/new/complaint/*/edit?*"
+
+                ],
+            "js": ["template_ticket.js"],
+            "run_at": "document_idle"
+        }
+    ]
+    
+    
+  }
