@@ -10,11 +10,13 @@
         {
             "matches": ["https://mykitchen.digital/new/complaint?uniqueId=*"],
             "js": ["disable_btn.js"],
+            "css":["style.css"],
             "run_at": "document_idle"
         },
         {
             "matches": ["https://mykitchen.digital/orders/*", "https://mykitchen.digital/orders"],
             "js": ["fraud_info.js"],
+            "css":["style.css"],
             "run_at": "document_idle"
         },
         
@@ -28,6 +30,7 @@
 
                 ],
             "js": ["template_ticket.js"],
+            "css":["style.css"],
             "run_at": "document_idle"
         }
     ]

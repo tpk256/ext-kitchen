@@ -2,10 +2,12 @@ const tag_name_ticket = "main";
 const ID_COMBOBOX_CONTENT = 'TEMPLATES_CONTENT';
 const ID_COMBOBOX_SOLUTION = 'TEMPLATES_SOLUTION';
 
+const ID_COMBOBOX_ORDER_COMPOSITION = 'TEMPLATES_ORDER_COMPOSITION';
+
 const LABEL_DIV_CSS_SELECTOR = "label.label-module___LTH6W__label.large-input-module__24r9Fa__largeInput__label div";
 const TEXT_AREA_CSS_SELECTOR = "textarea.large-input-module__24r9Fa__largeInput__textarea";
 
-console.log("init");
+
 
 const templates = [
       {
@@ -79,6 +81,7 @@ const templates = [
    
 ];
 
+
 function templateHandler(){
       let 
             select_content = document.getElementById(ID_COMBOBOX_CONTENT),
@@ -112,6 +115,58 @@ function templateHandler(){
 
 
 
+function initItemsOrderSelect(order_id, data){
+    const select = document.querySelector(`#${ID_COMBOBOX_ORDER_COMPOSITION + order_id}`);
+
+    if (!select) return;
+
+    select.innerHTML = "";
+    let items = data.order;
+
+    const opt_load = document.createElement("option");
+    opt_load.innerText = "Загружен";
+    opt_load.setAttribute("value", "");
+    select.appendChild(opt_load);
+
+    for (let i = 0; i < items.length; i++){
+        const opt = document.createElement("option");
+        opt.innerText = items[i].name + ` ${items[i].count} ШТ`;
+
+        let value = items[i].name;
+        if (items[i].components.length){
+            value += ' (';
+            for (let j = 0; j < items[i].components.length; j++){
+                    let component = items[i].components[j].name + `( ${items[i].components[j].count} ШТ )`;
+                    value += component + ";";
+            }
+
+            value += ')';
+        }
+
+        opt.setAttribute("value", value +";");
+        select.appendChild(opt);
+    }
+
+    select.addEventListener("change", () => {
+            const text_area = document.querySelector(TEXT_AREA_CSS_SELECTOR);
+            if (!text_area) return;
+
+            
+            text_area.value += select.options[select.selectedIndex].value;
+
+            const event = new Event('input', { bubbles: true });
+            text_area.dispatchEvent(event);
+
+
+        }
+
+
+    );
+
+}
+
+
+
 
 function templateHelper() {
 
@@ -132,7 +187,8 @@ function templateHelper() {
         test.includes(`https://mykitchen.digital/new/complaint/${ticket_uuid}/edit`)
     ){
 
-
+        const urlParams = new URLSearchParams(window.location.search);
+        let order_id = urlParams.get('uniqueId');
         let flag_solution = test.includes("refund");
         console.log(`flag_solution: ${flag_solution}`)
         
@@ -151,11 +207,8 @@ function templateHelper() {
           if (flag_solution)
               el = tag_main.querySelector(`#${ID_COMBOBOX_SOLUTION}`);
 
-          if (el){
-    
+          if (el) return;
 
-            return;
-          }
 
           let labels_div = tag_main.querySelectorAll(LABEL_DIV_CSS_SELECTOR);
 
@@ -180,11 +233,12 @@ function templateHelper() {
           
      
 
-
+          
           const select = document.createElement("select");
-          select.style.a
+          
           select.addEventListener("change", ()=>{ templateHandler();});
-         
+          select.classList.add("custom_select_0");
+
           select.id = ID_COMBOBOX_CONTENT;
           if (flag_solution)
             select.id = ID_COMBOBOX_SOLUTION;
@@ -201,6 +255,33 @@ function templateHelper() {
           const span = document.createElement('span');
           span.innerHTML = "<b> Шаблоны </b>";
           label_div.appendChild(span);
+
+
+          if (!flag_solution && order_id){
+                // создаем отображение состава
+                let select_composition = document.createElement("select");
+                select_composition.id = ID_COMBOBOX_ORDER_COMPOSITION + order_id;
+                let opt = document.createElement("option");
+                opt.setAttribute("value", "");
+                opt.innerText = "Не подгрузился";
+                select_composition.appendChild(opt);
+
+                select_composition.classList.add("custom_select_0");
+                label_div.appendChild(select_composition);
+                let span = document.createElement('span');
+                span.innerHTML = "<b> Состав </b>";
+                label_div.appendChild(span);
+
+                fetch(`https://mykitchen.digital/new/api/checkout/unique/${order_id}`).then(
+                    resp => resp.json()
+                ).then(
+                    data => {
+                        
+                        initItemsOrderSelect(order_id, data.value);
+                       
+                    }
+                );
+          }
     }
 
 
